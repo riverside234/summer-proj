@@ -2,6 +2,7 @@ import json
 import openai
 import os
 from dotenv import load_dotenv
+import random
 
 #add data to jsonl file
 def append_to_jsonl(file_path, new_data):
@@ -9,9 +10,13 @@ def append_to_jsonl(file_path, new_data):
         for data in new_data:
             jsonl_file.write(json.dumps(data) + '\n')
 
-jsonl_file_path = 'finetuning-data.jsonl'
+finetuning_jsonl_file_path = 'finetuning-data.jsonl'
 
-new_data = []
+finetuning_new_data = []
+
+prompt_eval_jsonl_file_path = 'prompt-eval-gpt4.jsonl'
+
+prompt_eval_new_data = []
 
 # Load the environment variables
 load_dotenv()
@@ -21,7 +26,7 @@ api_key = os.getenv("OPENAI_API_KEY")
 client = openai.OpenAI(api_key=api_key)
 
 # Define the topics
-topics = ["business", "technology", "science", "entertainment", "politics", "sports"]
+topics = ["Creative Writing", "Educational Content Creation", "Historical Analysis", "Scientific Explanation", "Psychological Insights"]
 
 #define agents
 agents = {
@@ -128,6 +133,7 @@ print(topicTasks)
  
 tasksLoad = json.loads(topicTasks)
 
+random_task = random.randint(1, 10)
 
 for i in range(1, 11):
 
@@ -146,15 +152,11 @@ for i in range(1, 11):
 
 
     response3 = CustomChatGPT("agent2", """
-    Please provide a LLM prompt incorporating all provided suggestions and information (agent information and design). Ensure the prompt is well-structured, coherent, concise, and utilizes formatting techniques. Provide the prompt in the following format:
+    Please provide a LLM prompt incorporating all provided suggestions and information (agent information and design). Ensure the prompt is well-structured, coherent, concise, and utilizes formatting techniques. 
+    -Provide the prompt in the following format:
     #Revised Prompt: 
     [revised prompt text goes here]
     """)
-
-    """
-    promptLoad = json.loads(prompt)
-    response3 = promptLoad["revisedPrompt"] 
-    """
 
     responseFinal = f"""
     <|begin_of_text|><|start_header_id|>system<|end_header_id|>
@@ -191,9 +193,13 @@ for i in range(1, 11):
     {response3}<|eot_id|><|start_header_id|>user<|end_header_id|>
     """
 
-    new_data.append({"text": responseFinal})
+    finetuning_new_data.append({"text": responseFinal})
 
-append_to_jsonl(jsonl_file_path, new_data)
+    if i == random_task:
+        prompt_eval_new_data.append({"original_prompt": task, "revised_prompt": response3})
+
+append_to_jsonl(finetuning_jsonl_file_path, finetuning_new_data)
+append_to_jsonl(prompt_eval_jsonl_file_path, prompt_eval_new_data)
 
 
 

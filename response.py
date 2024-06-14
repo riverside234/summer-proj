@@ -46,15 +46,11 @@ def read_prompt_jsonl(prompt_file_path):
             original_prompt = prompts['original_prompt']
             revised_prompt = prompts['revised_prompt']
              
-            messages = [{"role": "system", "content": f"""
-            You are a helpful assistant.
-            """}]
+            messages = [{"role": "system", "content": ""}]
 
             original_response = GPT(f"{original_prompt}")
 
-            messages = [{"role": "system", "content": f"""
-            You are a helpful assistant.
-            """}]
+            messages = [{"role": "system", "content": ""}]
             revised_response = GPT(f"{revised_prompt}")
 
             gpt4o_res.append({"task": original_prompt, "original_response": original_response, "revised_response": revised_response})

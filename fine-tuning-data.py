@@ -26,7 +26,7 @@ api_key = os.getenv("OPENAI_API_KEY")
 client = openai.OpenAI(api_key=api_key)
 
 # Define the topics
-topics = ["Creative Writing", "Educational Content Creation", "Historical Analysis", "Scientific Explanation", "Psychological Insights"]
+topics = ["Educational Content Creation", "Historical Analysis", "Scientific Explanation", "Psychological Insights"]
 
 #define agents
 agents = {

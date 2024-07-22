@@ -26,7 +26,7 @@ api_key = os.getenv("OPENAI_API_KEY")
 client = openai.OpenAI(api_key=api_key)
 
 # Define the topics
-topics = ["Educational Content Creation", "Historical Analysis", "Scientific Explanation", "Psychological Insights"]
+topics = ["Home Improvement and DIY Projects"]
 
 #define agents
 agents = {
@@ -82,7 +82,7 @@ agents = {
                 ##Purpose: [purpose of the given prompt for LLM].
                 ##Context: [context of the given prompt for LLM].
                 ##Desired Outcome: [expected outcome or response from LLM].
-            #Dimensions: 
+            #Eight Suggestions: 
                 1: [provide comprehensive and specific suggestions based on NLP dimensions].
                 2: ...
         """,
@@ -158,7 +158,11 @@ for i in range(1, 11):
     [revised prompt text goes here]
     """)
 
-    responseFinal = f"""
+    if i == random_task:
+        prompt_eval_new_data.append({"original_prompt": task, "revised_prompt": response3})
+    else:
+
+        responseFinal = f"""
     <|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
     You are a highly skilled Prompt Engineer and NLP Expert. Your task is to design an Large Language Model (LLM) agent, such as an agent based on GPT-4. 
@@ -195,8 +199,6 @@ for i in range(1, 11):
 
     finetuning_new_data.append({"text": responseFinal})
 
-    if i == random_task:
-        prompt_eval_new_data.append({"original_prompt": task, "revised_prompt": response3})
 
 append_to_jsonl(finetuning_jsonl_file_path, finetuning_new_data)
 append_to_jsonl(prompt_eval_jsonl_file_path, prompt_eval_new_data)

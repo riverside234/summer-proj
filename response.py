@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # initialize data and file paths
 gpt4o_res = []
 gpt4o_res_jsonl_file_path = 'gpt4o-gpt4oResponse.jsonl'
-prompt_jsonl_file_path = 'prompt-eval-gpt4.jsonl'
+prompt_jsonl_file_path = 'prompt-eval-gpt4-temp.jsonl'
 
 # Load the environment variables
 load_dotenv()

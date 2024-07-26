@@ -18,6 +18,10 @@ prompt_eval_jsonl_file_path = 'prompt-eval-gpt4.jsonl'
 
 prompt_eval_new_data = []
 
+tasks_eval_file_path = 'tasks-eval.jsonl'
+
+tasks_eval = []
+
 # Load the environment variables
 load_dotenv()
 
@@ -26,34 +30,10 @@ api_key = os.getenv("OPENAI_API_KEY")
 client = openai.OpenAI(api_key=api_key)
 
 # Define the topics
-topics = ["Home Improvement and DIY Projects"]
+topics = ["Fitness and Exercise Routines"]
 
 #define agents
 agents = {
-    "agent1": {
-        "system_message": """You are a highly skilled Prompt Engineer and NLP Expert. Your task is to design an Large Language Model (LLM) agent, such as an agent based on GPT-4.
-
-        Instructions:
-
-        -Identify the input task purpose, context, and desired outcome to guide LLM-focused analysis.
-
-        -Designing the agent based on the provided information.
-
-        -Provide an LLM prompt for the agent based on the design.
-
-        -Provide your suggestions in the following format:
-            
-            #Agent Info: 
-                ##Purpose: [purpose of the given prompt].
-                ##Context: [comprehensive context of the prompt].
-                ##Desired Outcome: [expected outcome or response from LLM].
-            
-            #Agent Plan: 
-                ##Agent Design: [Design a single LLM agent].
-                ##Agent Prompt: [LLM prompt that specify tasks].
-        """,
-        "messages": []
-    },
     "agent2": {
         "system_message": """
         You are a highly skilled Prompt Engineer and NLP Expert. Your task is to analyze a prompt intended for use with Large Language Model (LLM) like GPT-4.
@@ -62,7 +42,7 @@ agents = {
 
         -Identify the prompt purpose, context, and desired outcome to guide LLM-focused analysis.
 
-        -Consider provided angent infomation and plan, provide comprehensive and specific suggestions to optimize the prompt for enhanced LLM output quality:
+        -Provide comprehensive and specific suggestions to optimize the prompt for enhanced LLM output quality:
         1. Define the LLM character's role based on the task, such as act as a math professor.
         2. Provide suggestions for the prompt by break complex purpose down into smaller, more specific sub-tasks or more manageable steps.
         3. Use accurate, domain-specific terminology for precision and clarity.
@@ -75,15 +55,14 @@ agents = {
         -Provide as much suggestions as possible. Prioritize suggestions based on the prompt's desired outcome.
         -For lengthy suggestions, identify overarching themes in the suggestions and consolidate related suggestions into a single, focused recommendation.
 
-
         -Provide your suggestions in the following format:
 
             #Prompt Info:
                 ##Purpose: [purpose of the given prompt for LLM].
                 ##Context: [context of the given prompt for LLM].
                 ##Desired Outcome: [expected outcome or response from LLM].
-            #Eight Suggestions: 
-                1: [provide comprehensive and specific suggestions based on NLP dimensions].
+            #Suggestions for improvement based on instructions: 
+                1: [provide comprehensive and specific suggestions].
                 2: ...
         """,
         "messages": []
@@ -139,62 +118,36 @@ for i in range(1, 11):
 
     task = tasksLoad[str(i)]      
     #reset messages history  
-    agents["agent1"]["messages"] = []
     agents["agent2"]["messages"] = []
 
-    response1 = CustomChatGPT("agent1", f"""{task}""")
-
-    response2 = CustomChatGPT("agent2", f"""
-    {response1}
-
-    -Analysis the prompt for the agent.
+    response1 = CustomChatGPT("agent2", f"""
+    prompt <{task}>
     """)
 
-
-    response3 = CustomChatGPT("agent2", """
-    Please provide a LLM prompt incorporating all provided suggestions and information (agent information and design). Ensure the prompt is well-structured, coherent, concise, and utilizes formatting techniques. 
+    response2 = CustomChatGPT("agent2", """
+    Please provide a LLM prompt incorporating all provided suggestions. Ensure the prompt is well-structured, coherent, concise, and utilizes formatting techniques. 
     -Provide the prompt in the following format:
     #Revised Prompt: 
     [revised prompt text goes here]
     """)
 
     if i == random_task:
-        prompt_eval_new_data.append({"original_prompt": task, "revised_prompt": response3})
+        prompt_eval_new_data.append({"original_prompt": task, "revised_prompt": response2})
+        tasks_eval.append({"task": task})
     else:
 
         responseFinal = f"""
     <|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
-    You are a highly skilled Prompt Engineer and NLP Expert. Your task is to design an Large Language Model (LLM) agent, such as an agent based on GPT-4. 
-    Instructions:
-    -Identify the input task purpose, context, and desired outcome to guide LLM-focused analysis.
-    -Designing the agent based on the provided information.
-    -Provide an LLM prompt for the agent based on the design.
-    <|eot_id|><|start_header_id|>user<|end_header_id|>
+    You are a highly skilled Prompt Engineer and NLP Expert. Your task is to analyze a prompt intended for use with Large Language Model (LLM) like GPT-4.<|eot_id|><|start_header_id|>user<|end_header_id|>
 
-    {task}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+    Analysis prompt:{task}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
     {response1}<|eot_id|><|start_header_id|>user<|end_header_id|>
 
-    Analysis the prompt for the agent.
-    Instructions:
-    -Identify the prompt purpose, context, and desired outcome to guide LLM-focused analysis.
-    -Consider angent infomation and plan, provide comprehensive and specific suggestions to optimize the prompt for enhanced LLM output quality:
-        1. Define the LLM's role based on the task, e.g., math professor.
-        2. Break complex tasks into specific, manageable steps.
-        3. Use precise, domain-specific terminology.
-        4. Provide necessary background context for clarity.
-        5. Include all necessary details for completeness.
-        6. Consider exceptional scenarios and edge cases.
-        7. Specify output format, length, detail, and formatting.
-        8. Instruct the LLM to reason first, then provide the answer.
-    <|eot_id|><|start_header_id|>assistant<|end_header_id|>
-
-    {response2}<|eot_id|><|start_header_id|>user<|end_header_id|>
-
-    Please provide a LLM prompt incorporating all provided suggestions and information (agent information and design). Ensure the prompt is well-structured, coherent, concise, and utilizes formatting techniques. <|eot_id|><|start_header_id|>assistant<|end_header_id|>
-
-    {response3}<|eot_id|><|start_header_id|>user<|end_header_id|>
+    Please provide a LLM prompt incorporating all provided suggestions.<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+    
+    {response2}<|eot_id|>
     """
 
     finetuning_new_data.append({"text": responseFinal})
@@ -202,6 +155,7 @@ for i in range(1, 11):
 
 append_to_jsonl(finetuning_jsonl_file_path, finetuning_new_data)
 append_to_jsonl(prompt_eval_jsonl_file_path, prompt_eval_new_data)
+append_to_jsonl(tasks_eval_file_path, tasks_eval)
 
 
 
